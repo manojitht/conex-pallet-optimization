@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pallet Optimization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen p-8">
+
+    <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">3D Container Optimization Solver</h1>
+        
+        <form id="optimizationForm" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Select Algorithm</label>
+                <select id="algorithm" name="algorithm" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <option value="greedy">Greedy Heuristic</option>
+                    <option value="milp">Mixed-Integer Linear Programming (MILP)</option>
+                    <option value="genetic">Genetic Algorithm (GA)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Select Container Size</label>
+                <select id="containerSize" name="containerSize" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <option value="19,8,8,62000">20ft Standard (~19ft x 8ft x 8ft) (62,000 lbs)</option>
+                    <option value="39,8,8,71650" selected>40ft Standard (~39ft x 8ft x 8ft) (71,650 lbs)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">Upload Pallet Dataset (CSV)</label>
+                <input type="file" id="dataset" name="dataset" accept=".csv" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
+                Optimize Pallets
+            </button>
+        </form>
+    </div>
+
+    <div id="resultsModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Optimization Results</h3>
+                            
+                            <div class="grid grid-cols-5 gap-4 mt-4 text-sm text-gray-700 bg-gray-50 p-4 rounded border">
+                                <div><span class="font-bold block">Algorithm</span> <span id="resAlgo"></span></div>
+                                <div><span class="font-bold block">Total Profit</span> $<span id="resProfit"></span></div>
+                                <div><span class="font-bold block">Space Utilized</span> <span id="resSpace"></span>%</div>
+                                <div><span class="font-bold block">Weight Utilized</span> <span id="resWeight"></span>%</div>
+                                <div><span class="font-bold block">Runtime</span> <span id="resTime"></span></div>
+                            </div>
+
+                            <div class="mt-6 flex justify-center border p-2 rounded">
+                                <img id="resImage" src="" alt="3D Container Plot" class="max-w-full h-auto">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="closeModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('optimizationForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('algorithm', document.getElementById('algorithm').value);
+            formData.append('containerSize', document.getElementById('containerSize').value);
+            formData.append('dataset', document.getElementById('dataset').files[0]);
+
+            const response = await fetch('/api/optimize', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if(data.error) {
+                alert(data.error);
+                return;
+            }
+
+            // Populate Modal
+            document.getElementById('resAlgo').innerText = data.algorithm;
+            document.getElementById('resProfit').innerText = data.profit;
+            document.getElementById('resSpace').innerText = data.space_utilization;
+            document.getElementById('resWeight').innerText = data.weight_utilization;
+            document.getElementById('resTime').innerText = data.runtime;
+            document.getElementById('resImage').src = "data:image/png;base64," + data.image_base64;
+
+            // Show Modal
+            document.getElementById('resultsModal').classList.remove('hidden');
+        });
+
+        function closeModal() {
+            document.getElementById('resultsModal').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
