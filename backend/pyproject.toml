@@ -9,5 +9,6 @@ dependencies = [
     "matplotlib>=3.10.0",
     "numpy>=2.2.3",
     "pandas>=3.0.2",
+    "pulp>=3.3.0",
     "pydantic>=2.10.6",
 ]
