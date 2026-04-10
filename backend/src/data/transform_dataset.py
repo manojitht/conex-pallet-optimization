@@ -2,27 +2,21 @@ import pandas as pd
 import numpy as np
 import random
 
-# 1. Load your real-world dataset (replace 'real_data.csv' with your actual file)
 df = pd.read_csv('real_data/shipoci_dataset.csv')
 
-# 2. Expand rows so every individual pallet has its own row
+# Expand rows so every individual pallet has its own row
 df_expanded = df.loc[df.index.repeat(df['pallets'])].reset_index(drop=True)
 
-# 3. Calculate per-pallet metrics
 df_expanded['per_pallet_weight'] = df_expanded['weight'] / df_expanded['pallets']
 df_expanded['per_pallet_cube'] = df_expanded['cube'] / df_expanded['pallets']
 
-# 4. Initialize the Synthetic DataFrame
 synthetic_df = pd.DataFrame()
 
 # Generate sequential IDs (P1, P2, P3...)
 synthetic_df['id'] = ['P' + str(i+1) for i in range(len(df_expanded))]
 
-# Randomly assign Origin
 synthetic_df['origin'] = np.random.choice(['EU', 'NA'], size=len(df_expanded))
 
-# Assign Pallet Size and standard Length/Width based on synthetic target patterns
-# Assuming mostly 'FULL' pallets (4x3) for standard cargo, 'HALF' (2x3) for smaller volumes
 conditions = [
     (df_expanded['per_pallet_cube'] > 30),
     (df_expanded['per_pallet_cube'] <= 30)
@@ -68,7 +62,6 @@ synthetic_df['max_stack_weight'] = np.where(synthetic_df['stackable'], np.random
 synthetic_df['cost'] = np.round((synthetic_df['weight'] * 0.5) + (synthetic_df['distance'] * 0.2)).astype(int)
 synthetic_df['profit'] = np.round(synthetic_df['cost'] * np.random.uniform(1.5, 3.0, size=len(df_expanded))).astype(int)
 
-# 5. Export to match target format
 print(synthetic_df.head())
 synthetic_df.to_csv('real_data/shipoci_dataset_transformed.csv', index=False)
 
