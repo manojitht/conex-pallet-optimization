@@ -4,7 +4,7 @@
 # 📦 2D ConEx Pallet Optimization Solver
 
 
-This repository contains an advanced algorithmic solution to the **2D ConEx Pallet Optimization Solver**, a heavily constrained variation of the classic 0/1 Knapsack problem. Developed for **IT5082 - Optimization Methods** assignment, this project benchmarks three distinct optimization strategies Exact Methods, Heuristics, and Metaheuristics—to evaluate their performance, scalability, and physical feasibility in real-world logistics.
+This repository contains an advanced algorithmic solution to the **2D ConEx Pallet Optimization Solver**, a heavily constrained variation of the classic 0/1 Knapsack problem. Developed for **IT5082 - Optimization Methods** assignment, this project benchmarks three distinct optimization strategies Exact Methods, Heuristics, and Metaheuristics to evaluate their performance, scalability, and physical feasibility in real-world logistics.
 
 -----
 
@@ -95,13 +95,19 @@ The algorithms were tested against the dataset on a standard compute environment
 
 *Fast execution, but leaves highly fragmented, unusable space due to lack of backtracking.*
 
+![img alt](https://github.com/manojitht/conex-pallet-optimization/blob/fe1f0274d2618643da900fa53c1c1ba3015e389b/results/greedy_heuristic.png)
+
 #### 2\. Genetic Algorithm (GA)
 
 *Achieves higher profit than the heuristic in under 2 seconds by evolving the placement sequence.*
 
+![img alt](https://github.com/manojitht/conex-pallet-optimization/blob/fe1f0274d2618643da900fa53c1c1ba3015e389b/results/genetic_algorithm.png)
+
 #### 3\. Mixed-Integer Linear Programming (MILP)
 
 *Terminated at the 180-second threshold. Found the highest profit layout before timeout, but demonstrates the computational impossibility of reaching true optimality for large $N$ datasets.*
+
+![img alt](https://github.com/manojitht/conex-pallet-optimization/blob/fe1f0274d2618643da900fa53c1c1ba3015e389b/results/milp.png)
 
 ### Discussion
 
