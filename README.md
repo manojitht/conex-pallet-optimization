@@ -52,20 +52,6 @@ The optimization models are evaluated using a synthetic, logistics-oriented data
 
 To guarantee true optimality, the problem is formulated as a **Mixed-Integer Linear Programming (MILP)** model. The physical geometry is translated into algebraic equations using the "Big-M" method.
 
-**Objective Function (Maximize Profit):**
-$$\text{Maximize } Z = \sum_{i=1}^{n} p_i s_i$$
-*(Where $p_i$ is profit, and $s_i \in \{0,1\}$ indicates if pallet $i$ is selected)*
-
-**Key Constraints:**
-
-1.  **Weight Limit:** $$\sum (w_i \cdot s_i) \le W_{max}$$
-2.  **Boundary Restrictions (Container Limits):**
-    $$x_i + \text{length}_i \le L + M(1 - s_i)$$
-    $$y_i + \text{width}_i \le W + M(1 - s_i)$$
-    $$z_i + \text{height}_i \le H + M(1 - s_i)$$
-3.  **Non-Overlapping Logic (Big-M):** If pallets $i$ and $j$ are both selected, they must be separated in at least one spatial dimension (Left, Right, Front, Back, Up, Down).
-    $$x_i + \text{length}_i \le x_j + M(1 - l_{ij}) + M(2 - s_i - s_j)$$
-    *(This logic repeats across all 6 axes, enforcing $\sum \text{directions} \ge 1$)*
 
 -----
 
