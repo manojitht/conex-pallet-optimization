@@ -1,5 +1,5 @@
 [project]
-name = "bin-packing-optimization"
+name = "connex-pallet-optimization"
 version = "0.1.0"
 description = "Optimization Methods Assessment"
 readme = "README.md"
