@@ -1,10 +1,10 @@
 
 -----
 
-# 📦 2D ConEx Pallet Optimization Solver
+# 📦 3D ConEx Pallet Loading Optimization Solver
 
 
-This repository contains an advanced algorithmic solution to the **2D ConEx Pallet Optimization Solver**, a heavily constrained variation of the classic 0/1 Knapsack problem. Developed for **IT5082 - Optimization Methods** assignment, this project benchmarks three distinct optimization strategies Exact Methods, Heuristics, and Metaheuristics to evaluate their performance, scalability, and physical feasibility in real-world logistics.
+This repository contains an advanced algorithmic solution to the **3D ConEx Pallet Loading Optimization Solver**, a heavily constrained variation of the classic 0/1 Knapsack problem. Developed for **IT5082 - Optimization Methods** assignment, this project benchmarks three distinct optimization strategies Exact Methods, Heuristics, and Metaheuristics to evaluate their performance, scalability, and physical feasibility in real-world logistics.
 
 -----
 
@@ -44,7 +44,7 @@ The optimization models are evaluated using a synthetic, logistics-oriented data
   * `cost`: The Logistics spending charges for the loading the item.
   * `fragile`: Boolean indicating if items can be stacked above it.
   * `stackable`: Boolean indicating if the item can be placed on top of others.
-  * `max_stack_weight`: The maximum allowable weight pressure for the item.
+  * `max_stack_weight`: The maximum allowable weight pressure for the item.s
 
 -----
 
@@ -60,8 +60,8 @@ To guarantee true optimality, the problem is formulated as a **Mixed-Integer Lin
 
 Three distinct approaches were implemented to demonstrate the trade-offs between computational speed and mathematical optimality.
 
-  * **Greedy Heuristic (Baseline):** Sorts pallets by *Profit Density* (Profit/Volume) and sequentially packs them. Extremely fast ($O(n \log n)$), but prone to early local optima and the "Swiss Cheese" fragmentation effect.
-  * **Exact Method (MILP via PuLP):** Utilizes the Branch & Bound algorithm to mathematically prove the highest possible profit. Subject to extreme exponential time complexity and memory limits due to $O(N^2)$ binary non-overlap variables.
+  * **Greedy Heuristic (Baseline):** Sorts pallets by *Profit Density* (Profit/Volume) and sequentially packs them. Extremely fast O(n log n), but prone to early local optima and the "Swiss Cheese" fragmentation effect.
+  * **Exact Method (MILP via PuLP):** Utilizes the Branch & Bound algorithm to mathematically prove the highest possible profit. Subject to extreme exponential time complexity and memory limits due to O(N^2) binary non-overlap variables.
   * **Genetic Algorithm (GA):** A metaheuristic evolutionary approach. Uses an **Order Crossover (OX1)** sequence optimizer and Swap Mutation. It simulates the physical packing to score "fitness," easily bypassing the RAM limitations of MILP while avoiding the local optima traps of the Greedy approach.
 
 -----

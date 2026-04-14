@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ConEx Pallet Optimization</title>
+    <title>ConEx Pallet Loading Optimization</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-50 min-h-screen p-8">
+<body class="bg-gray-50 min-h-screen p-8 relative">
 
     <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold mb-6 text-gray-800">2D ConEx Pallet Optimization Solver</h1>
+        <h1 class="text-2xl font-bold mb-6 text-gray-800">3D ConEx Pallet Loading Optimization Solver</h1>
         
         <form id="optimizationForm" class="space-y-6">
             <div>
@@ -34,10 +34,16 @@
                 <input type="file" id="dataset" name="dataset" accept=".csv" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
             </div>
 
-            <button type="submit" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none">
+            <button type="submit" id="submitBtn" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed">
                 Optimize Pallets
             </button>
         </form>
+    </div>
+
+    <div id="loadingOverlay" class="hidden fixed z-50 inset-0 bg-gray-900 bg-opacity-60 flex flex-col items-center justify-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white mb-4"></div>
+        <h2 class="text-white text-xl font-semibold">Running Pallet Optimization...</h2>
+        <p class="text-gray-200 mt-2 text-sm">This may take up some time.</p>
     </div>
 
     <div id="resultsModal" class="hidden fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -78,33 +84,53 @@
         document.getElementById('optimizationForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
+            // DOM Elements
+            const submitBtn = document.getElementById('submitBtn');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Prepare Data
             const formData = new FormData();
             formData.append('algorithm', document.getElementById('algorithm').value);
             formData.append('containerSize', document.getElementById('containerSize').value);
             formData.append('dataset', document.getElementById('dataset').files[0]);
 
-            const response = await fetch('/api/optimize', {
-                method: 'POST',
-                body: formData
-            });
+            // Show Loading State
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing...";
+            loadingOverlay.classList.remove('hidden');
 
-            const data = await response.json();
+            try {
+                const response = await fetch('/api/optimize', {
+                    method: 'POST',
+                    body: formData
+                });
 
-            if(data.error) {
-                alert(data.error);
-                return;
+                const data = await response.json();
+
+                if(data.error) {
+                    alert(data.error);
+                    return;
+                }
+
+                // Populate Modal
+                document.getElementById('resAlgo').innerText = data.algorithm;
+                document.getElementById('resProfit').innerText = data.profit;
+                document.getElementById('resSpace').innerText = data.space_utilization;
+                document.getElementById('resWeight').innerText = data.weight_utilization;
+                document.getElementById('resTime').innerText = data.runtime;
+                document.getElementById('resImage').src = "data:image/png;base64," + data.image_base64;
+
+                // Show Modal
+                document.getElementById('resultsModal').classList.remove('hidden');
+            } catch (error) {
+                console.error("Optimization failed:", error);
+                alert("An error occurred while connecting to the server.");
+            } finally {
+                // Remove Loading State (runs whether request succeeds or fails)
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Optimize Pallets";
+                loadingOverlay.classList.add('hidden');
             }
-
-            // Populate Modal
-            document.getElementById('resAlgo').innerText = data.algorithm;
-            document.getElementById('resProfit').innerText = data.profit;
-            document.getElementById('resSpace').innerText = data.space_utilization;
-            document.getElementById('resWeight').innerText = data.weight_utilization;
-            document.getElementById('resTime').innerText = data.runtime;
-            document.getElementById('resImage').src = "data:image/png;base64," + data.image_base64;
-
-            // Show Modal
-            document.getElementById('resultsModal').classList.remove('hidden');
         });
 
         function closeModal() {
